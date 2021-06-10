@@ -162,3 +162,56 @@ export function getDistinctIndices(
 export function getDefaultSeed(): number {
   return 0x1234567890;
 }
+
+/**
+ * Return the amount of bytes needed to fit the input bits
+ * @return Length of Unit8Array to use
+ * @param bitCount    - amount of bits the filter uses
+ */
+export function getUint8ArrayLength(bitCount: number): number {
+  const remainder = bitCount % 8;
+  const bitFill = 8 - remainder;
+  return (bitCount + bitFill) / 8;
+}
+
+/**
+ * Return the index of the byte to be edited within the array
+ * @return Array index of the byte to be edited
+ * @param bitIndex    - index of the bit to be set
+ */
+export function getByteIndexInArray(bitIndex: number): number {
+  return Math.floor(bitIndex / 8);
+}
+
+/**
+ * Return the index of the bit in the byte to edit
+ * @return Array index of the byte to be edited
+ * @param bitIndex    - index of the bit to be set
+ */
+export function getBitIndex(bitIndex: number): number {
+  return bitIndex % 8;
+}
+
+/**
+ * Set a certain bit in the byte to 1
+ * @return Edited byte
+ * @param indexInByte     - Index of the bit in the byte to be set
+ * @param byte            - Current byte
+ */
+export function setBitInByte(indexInByte: number, byte: number): number {
+  const byteOR = 1 << indexInByte;
+  return byte | byteOR;
+}
+
+/**
+ * Returns a bit at a given index
+ * @return Bit 1 | 0
+ * @param array     - Uint8Array containing bloom filter
+ * @param bitIndex  - Index of bit to read
+ */
+export function getBitAtIndex(array: Uint8Array, bitIndex: number): number {
+  const byte = array[getByteIndexInArray(bitIndex)];
+  const indexInByte = getBitIndex(bitIndex);
+  const byteAND = setBitInByte(indexInByte, 0);
+  return (byte & byteAND) >> indexInByte;
+}

@@ -100,12 +100,7 @@ describe("BloomFilter", () => {
     const filter = BloomFilter.from(["alice", "bob", "carl"], targetRate, seed);
     it("should export a bloom filter to a Uint8Array", () => {
       const exported = filter.export();
-      exported._seed.should.equal(filter.seed);
-      exported.type.should.equal("BloomFilter");
-      exported._size.should.equal(filter.size);
-      exported._length.should.equal(filter.length);
-      exported._nbHashes.should.equal(filter._nbHashes);
-      exported._filter.should.deep.equal(filter._filter);
+      exported.length.should.equal(filter._filter.length + 4 * 8);
     });
 
     it("should create a bloom filter from a Uint8Array export", () => {
@@ -116,22 +111,9 @@ describe("BloomFilter", () => {
       newFilter.length.should.equal(filter.length);
       newFilter._nbHashes.should.equal(filter._nbHashes);
       newFilter._filter.should.deep.equal(filter._filter);
-    });
-
-    it("should reject imports from invalid Uint8Array imports", () => {
-      const invalids = [
-        { type: "something" },
-        { type: "BloomFilter" },
-        { type: "BloomFilter", _size: 1 },
-        { type: "BloomFilter", _size: 1, _length: 1 },
-        { type: "BloomFilter", _size: 1, _length: 1, _nbHashes: 2 },
-        { type: "BloomFilter", _size: 1, _length: 1, _nbHashes: 2, seed: 1 },
-      ];
-
-      invalids.forEach((json) => {
-        (() => BloomFilter.fromJSON(json)).should.throw(Error);
-      });
-      //TODO: Make this work
+      newFilter.has("alice").should.equal(true);
+      newFilter.has("bob").should.equal(true);
+      newFilter.has("carl").should.equal(true);
     });
   });
 
