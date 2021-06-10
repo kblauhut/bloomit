@@ -96,10 +96,10 @@ describe("BloomFilter", () => {
     });
   });
 
-  describe("#saveAsJSON", () => {
+  describe("#export", () => {
     const filter = BloomFilter.from(["alice", "bob", "carl"], targetRate, seed);
-    it("should export a bloom filter to a JSON object", () => {
-      const exported = filter.saveAsJSON();
+    it("should export a bloom filter to a Uint8Array", () => {
+      const exported = filter.export();
       exported._seed.should.equal(filter.seed);
       exported.type.should.equal("BloomFilter");
       exported._size.should.equal(filter.size);
@@ -108,21 +108,17 @@ describe("BloomFilter", () => {
       exported._filter.should.deep.equal(filter._filter);
     });
 
-    it("should create a bloom filter from a JSON export", () => {
-      let exported = filter.saveAsJSON();
-      // simulate serialization
-      exported = JSON.stringify(exported);
-      // simulate deserialization
-      exported = JSON.parse(exported);
-      const newFilter = BloomFilter.fromJSON(exported);
-      newFilter.seed.should.equal(filter.seed);
-      newFilter.size.should.equal(filter._size);
-      newFilter.length.should.equal(filter._length);
+    it("should create a bloom filter from a Uint8Array export", () => {
+      const exported = filter.export();
+      const newFilter = BloomFilter.import(exported);
+      newFilter._seed.should.equal(filter._seed);
+      newFilter.size.should.equal(filter.size);
+      newFilter.length.should.equal(filter.length);
       newFilter._nbHashes.should.equal(filter._nbHashes);
       newFilter._filter.should.deep.equal(filter._filter);
     });
 
-    it("should reject imports from invalid JSON objects", () => {
+    it("should reject imports from invalid Uint8Array imports", () => {
       const invalids = [
         { type: "something" },
         { type: "BloomFilter" },
@@ -135,6 +131,7 @@ describe("BloomFilter", () => {
       invalids.forEach((json) => {
         (() => BloomFilter.fromJSON(json)).should.throw(Error);
       });
+      //TODO: Make this work
     });
   });
 

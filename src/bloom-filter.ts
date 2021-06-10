@@ -26,6 +26,7 @@ SOFTWARE.
 
 import { optimalFilterSize, optimalHashes } from "./formulas";
 import { HashableInput, getDistinctIndices } from "./utils";
+import { int64ToUint8Array, uint8ArrayToInt64 } from "./encoding";
 
 /**
  * A Bloom filter is a space-efficient probabilistic data structure, conceived by Burton Howard Bloom in 1970,
@@ -46,7 +47,7 @@ export default class BloomFilter {
 
   /**
    * Constructor
-   * @param size - The number of cells
+   * @param size - The number of cells. Always a multiple of 8.
    * @param nbHashes - The number of hash functions used
    */
   constructor(size: number, nbHashes: number) {
@@ -174,5 +175,45 @@ export default class BloomFilter {
       return false;
     }
     return this._filter.every((value, index) => other._filter[index] === value);
+  }
+
+  /**
+   * Generate a bloom filter from a binary export.
+   * @param  binaryBloomFilter - The bloom filter as a Uint8Array
+   * @return Bloom filter generated from the exported binary filter
+   */
+  static import(binaryBloomFilter: Uint8Array): BloomFilter {
+    const seedArray = binaryBloomFilter.slice(0, 8);
+    const nbHashesArray = binaryBloomFilter.slice(8, 16);
+    const lengthArray = binaryBloomFilter.slice(16, 24);
+    const filterArray = binaryBloomFilter.slice(24, binaryBloomFilter.length);
+
+    const bloomFilter = new BloomFilter(
+      filterArray.length,
+      uint8ArrayToInt64(nbHashesArray)
+    );
+
+    bloomFilter._seed = uint8ArrayToInt64(seedArray);
+    bloomFilter._length = uint8ArrayToInt64(lengthArray);
+    bloomFilter._filter = filterArray;
+    return bloomFilter;
+  }
+
+  /**
+   * Generate a binary export for the bloom filter.
+   * @return Binary Unit8Array export of the bloom filter
+   */
+  export(): Uint8Array {
+    const exportArray = new Uint8Array(this._size + 3 * 8); // Filter length + 3 number parameters
+    exportArray.set(int64ToUint8Array(this._seed), 0);
+    exportArray.set(int64ToUint8Array(this._nbHashes), 8);
+    exportArray.set(int64ToUint8Array(this._length), 16);
+
+    let exportArrayIndex = 24;
+    for (let index = 0; index < this._filter.length; index += 1) {
+      exportArray[exportArrayIndex] = this._filter[index];
+      exportArrayIndex += 1;
+    }
+    return exportArray;
   }
 }
