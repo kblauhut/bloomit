@@ -98,6 +98,7 @@ export default class BloomFilter {
    * Generate a bloom filter from a binary export.
    * @param  binaryBloomFilter - The bloom filter as a Uint8Array
    * @return Bloom filter generated from the exported binary filter
+   * @author Kolja Blauhut
    */
   static import(binaryBloomFilter: Uint8Array): BloomFilter {
     const seedArray = binaryBloomFilter.slice(0, 8);
@@ -215,6 +216,7 @@ export default class BloomFilter {
   /**
    * Generate a binary export for the bloom filter.
    * @return Binary Unit8Array export of the bloom filter
+   * @author Kolja Blauhut
    */
   export(): Uint8Array {
     const exportArray = new Uint8Array(this._filter.length + 4 * 8); // Filter length + 4 number parameters

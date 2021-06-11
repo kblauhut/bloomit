@@ -178,6 +178,7 @@ export function getUint8ArrayLength(bitCount: number): number {
  * Return the index of the byte to be edited within the array
  * @return Array index of the byte to be edited
  * @param bitIndex    - index of the bit to be set
+ * @author Kolja Blauhut
  */
 export function getByteIndexInArray(bitIndex: number): number {
   return Math.floor(bitIndex / 8);
@@ -187,6 +188,7 @@ export function getByteIndexInArray(bitIndex: number): number {
  * Return the index of the bit in the byte to edit
  * @return Array index of the byte to be edited
  * @param bitIndex    - index of the bit to be set
+ * @author Kolja Blauhut
  */
 export function getBitIndex(bitIndex: number): number {
   return bitIndex % 8;
@@ -197,6 +199,7 @@ export function getBitIndex(bitIndex: number): number {
  * @return Edited byte
  * @param indexInByte     - Index of the bit in the byte to be set
  * @param byte            - Current byte
+ * @author Kolja Blauhut
  */
 export function setBitInByte(indexInByte: number, byte: number): number {
   const byteOR = 1 << indexInByte;
@@ -208,6 +211,7 @@ export function setBitInByte(indexInByte: number, byte: number): number {
  * @return Bit 1 | 0
  * @param array     - Uint8Array containing bloom filter
  * @param bitIndex  - Index of bit to read
+ * @author Kolja Blauhut
  */
 export function getBitAtIndex(array: Uint8Array, bitIndex: number): number {
   const byte = array[getByteIndexInArray(bitIndex)];
