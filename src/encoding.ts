@@ -3,20 +3,10 @@
 export const int32ToUint8Array = (n: number): Uint8Array => {
   const bytes = new Uint8Array(4);
   for (let index = 3; index >= 0; index -= 1) {
-    /* tslint:disable:no-bitwise */
     bytes[index] = n & 0xff;
     n >>= 8;
-    /* tslint:enable:no-bitwise */
   }
   return bytes;
-};
-
-export const uint8ArrayToInt32 = (byteArray: Uint8Array): number => {
-  let int32 = 0;
-  for (const [index, byte] of byteArray.entries()) {
-    int32 += byte * 2 ** (24 - index * 8);
-  }
-  return int32;
 };
 
 export const uint8ArrayToInt64 = (byteArray: Uint8Array): number => {
