@@ -19,12 +19,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kblauhut/bl00mer.git"
+    "url": "git+https://github.com/kblauhut/bloomit.git"
   },
   "author": "Kolja Blauhut",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kblauhut/bl00mer/issues"
+    "url": "https://github.com/kblauhut/bloomit/issues"
   },
-  "homepage": "https://github.com/kblauhut/bl00mer#readme"
+  "homepage": "https://github.com/kblauhut/bloomit#readme",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "bloom-filter",
+    "bloom",
+    "filter"
+  ]
 }
