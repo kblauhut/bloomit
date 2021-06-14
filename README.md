@@ -1,11 +1,11 @@
-# bl00mer
+# bloomit
 
-bl00mer is a Space efficient bloom filter based on the
+bloomit is a Space efficient bloom filter based on the
 [bloom-filters npm package](https://www.npmjs.com/package/bloom-filters).
 
 The main motivation for this package was to reduce the memory usage of the bloom
 filter by using a bitmap instead of an array of javascript numbers. This should
-result in a theoretical memory reduction by a factor of 64!
+result in a theoretical memory reduction by a factor of 64.
 
 I have also edited the export to use a Uint8Array which encodes all needed
 values and can be used to send it over the web efficiently.
@@ -30,7 +30,7 @@ allowable errors_. Communications of the ACM, 13(7), 422-426.
 - `rate() -> number`: compute the filter's false positive rate (or error rate).
 
 ```javascript
-const { BloomFilter } = require('bloom-filters');
+const { BloomFilter } = require('bloomit');
 // create a Bloom Filter with a size of 10 and 4 hash functions
 let filter = new BloomFilter(10, 4);
 // insert data
