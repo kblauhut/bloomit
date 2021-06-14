@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-"use strict";
+'use strict';
 
-import { optimalFilterSize, optimalHashes } from "./formulas";
+import { optimalFilterSize, optimalHashes } from './formulas';
 import {
   HashableInput,
   getDistinctIndices,
@@ -33,8 +33,8 @@ import {
   getBitIndex,
   setBitInByte,
   getBitAtIndex,
-} from "./utils";
-import { int64ToUint8Array, uint8ArrayToInt64 } from "./encoding";
+} from './utils';
+import { int64ToUint8Array, uint8ArrayToInt64 } from './encoding';
 
 /**
  * A Bloom filter is a space-efficient probabilistic data structure, conceived by Burton Howard Bloom in 1970,
@@ -90,7 +90,7 @@ export default class BloomFilter {
   static from(items: Iterable<HashableInput>, errorRate: number): BloomFilter {
     const array = Array.from(items);
     const filter = BloomFilter.create(array.length, errorRate);
-    array.forEach((element) => filter.add(element));
+    array.forEach(element => filter.add(element));
     return filter;
   }
 

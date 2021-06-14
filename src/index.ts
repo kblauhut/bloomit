@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-export { default as BloomFilter } from "./bloom-filter";
+export { default as BloomFilter } from './bloom-filter';

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 export const int32ToUint8Array = (n: number): Uint8Array => {
   const bytes = new Uint8Array(4);

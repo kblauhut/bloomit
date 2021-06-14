@@ -22,26 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-"use strict";
+'use strict';
 
-require("chai").should();
-const { BloomFilter } = require("../dist/index.js");
+require('chai').should();
+const { BloomFilter } = require('../dist/index.js');
 
-describe("BloomFilter", () => {
+describe('BloomFilter', () => {
   const targetRate = 0.1;
   const seed = Math.random();
 
-  describe("construction", () => {
-    it("should add element to the filter with #add", () => {
+  describe('construction', () => {
+    it('should add element to the filter with #add', () => {
       const filter = BloomFilter.create(15, targetRate);
       filter.seed = seed;
-      filter.add("alice");
-      filter.add("bob");
+      filter.add('alice');
+      filter.add('bob');
       filter.length.should.equal(2);
     });
 
-    it("should build a new filter using #from", () => {
-      const data = ["alice", "bob", "carl"];
+    it('should build a new filter using #from', () => {
+      const data = ['alice', 'bob', 'carl'];
       const expectedSize = Math.ceil(
         -((data.length * Math.log(targetRate)) / Math.pow(Math.log(2), 2))
       );
@@ -56,54 +56,54 @@ describe("BloomFilter", () => {
     });
   });
 
-  describe("#has", () => {
-    const filter = BloomFilter.from(["alice", "bob", "carl"], targetRate);
-    it("should return false for elements that are definitively not in the set", () => {
-      filter.has("daniel").should.equal(false);
-      filter.has("al").should.equal(false);
+  describe('#has', () => {
+    const filter = BloomFilter.from(['alice', 'bob', 'carl'], targetRate);
+    it('should return false for elements that are definitively not in the set', () => {
+      filter.has('daniel').should.equal(false);
+      filter.has('al').should.equal(false);
     });
 
-    it("should return true for elements that might be in the set", () => {
-      filter.has("alice").should.equal(true);
-      filter.has("bob").should.equal(true);
-      filter.has("carl").should.equal(true);
+    it('should return true for elements that might be in the set', () => {
+      filter.has('alice').should.equal(true);
+      filter.has('bob').should.equal(true);
+      filter.has('carl').should.equal(true);
     });
   });
 
-  describe("#equals", () => {
-    it("should returns True when two filters are equals", () => {
-      const first = BloomFilter.from(["alice", "bob", "carol"], targetRate);
-      const other = BloomFilter.from(["alice", "bob", "carol"], targetRate);
+  describe('#equals', () => {
+    it('should returns True when two filters are equals', () => {
+      const first = BloomFilter.from(['alice', 'bob', 'carol'], targetRate);
+      const other = BloomFilter.from(['alice', 'bob', 'carol'], targetRate);
       first.equals(other).should.equal(true);
     });
 
-    it("should returns False when two filters have different sizes", () => {
+    it('should returns False when two filters have different sizes', () => {
       const first = new BloomFilter(15, 4);
       const other = new BloomFilter(10, 4);
       first.equals(other).should.equal(false);
     });
 
-    it("should returns False when two filters have different nb. of hash functions", () => {
+    it('should returns False when two filters have different nb. of hash functions', () => {
       const first = new BloomFilter(15, 4);
       const other = new BloomFilter(15, 2);
       first.equals(other).should.equal(false);
     });
 
-    it("should returns False when two filters have different content", () => {
-      const first = BloomFilter.from(["alice", "bob", "carol"], targetRate);
-      const other = BloomFilter.from(["alice", "bob", "daniel"], targetRate);
+    it('should returns False when two filters have different content', () => {
+      const first = BloomFilter.from(['alice', 'bob', 'carol'], targetRate);
+      const other = BloomFilter.from(['alice', 'bob', 'daniel'], targetRate);
       first.equals(other).should.equal(false);
     });
   });
 
-  describe("#export", () => {
-    const filter = BloomFilter.from(["alice", "bob", "carl"], targetRate, seed);
-    it("should export a bloom filter to a Uint8Array", () => {
+  describe('#export', () => {
+    const filter = BloomFilter.from(['alice', 'bob', 'carl'], targetRate, seed);
+    it('should export a bloom filter to a Uint8Array', () => {
       const exported = filter.export();
       exported.length.should.equal(filter._filter.length + 4 * 8);
     });
 
-    it("should create a bloom filter from a Uint8Array export", () => {
+    it('should create a bloom filter from a Uint8Array export', () => {
       const exported = filter.export();
       const newFilter = BloomFilter.import(exported);
       newFilter._seed.should.equal(filter._seed);
@@ -111,20 +111,20 @@ describe("BloomFilter", () => {
       newFilter.length.should.equal(filter.length);
       newFilter._nbHashes.should.equal(filter._nbHashes);
       newFilter._filter.should.deep.equal(filter._filter);
-      newFilter.has("alice").should.equal(true);
-      newFilter.has("bob").should.equal(true);
-      newFilter.has("carl").should.equal(true);
+      newFilter.has('alice').should.equal(true);
+      newFilter.has('bob').should.equal(true);
+      newFilter.has('carl').should.equal(true);
     });
   });
 
-  describe("Performance test", () => {
+  describe('Performance test', () => {
     const max = 1000;
     const targetedRate = 0.01;
     it(`should not return an error when inserting ${max} elements`, () => {
       const filter = BloomFilter.create(max, targetedRate);
-      for (let i = 0; i < max; ++i) filter.add("" + i);
+      for (let i = 0; i < max; ++i) filter.add('' + i);
       for (let i = 0; i < max; ++i) {
-        filter.has("" + i).should.equal(true);
+        filter.has('' + i).should.equal(true);
       }
       let current;
       let falsePositive = 0;
@@ -132,7 +132,7 @@ describe("BloomFilter", () => {
       for (let i = max; i < max * 11; ++i) {
         tries++;
         current = i;
-        const has = filter.has("" + current, true);
+        const has = filter.has('' + current, true);
         if (has) falsePositive++;
       }
       const currentrate = falsePositive / tries;

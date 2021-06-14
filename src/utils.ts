@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-"use strict";
+'use strict';
 
-import XXH from "xxhashjs";
+import XXH from 'xxhashjs';
 
 /**
  * Utilitaries functions
@@ -76,11 +76,11 @@ export function hashTwice(
   } else {
     let one = f.toString(16);
     if (one.length < 16) {
-      one = "0".repeat(16 - one.length) + one;
+      one = '0'.repeat(16 - one.length) + one;
     }
     let two = l.toString(16);
     if (two.length < 16) {
-      two = "0".repeat(16 - two.length) + two;
+      two = '0'.repeat(16 - two.length) + two;
     }
     return {
       first: Number(one),
