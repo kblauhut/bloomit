@@ -33,8 +33,7 @@ describe('BloomFilter', () => {
 
   describe('construction', () => {
     it('should add element to the filter with #add', () => {
-      const filter = BloomFilter.create(15, targetRate);
-      filter.seed = seed;
+      const filter = BloomFilter.create(15, targetRate, seed);
       filter.add('alice');
       filter.add('bob');
       filter.length.should.equal(2);

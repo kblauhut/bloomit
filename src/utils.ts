@@ -45,6 +45,7 @@ interface TwoHashes {
 }
 
 export type HashableInput = string | ArrayBuffer | Buffer;
+export type Bit = 0 | 1;
 
 /**
  * (64-bits only) Hash a value into two values (in hex or integer format)
@@ -213,9 +214,9 @@ export function setBitInByte(indexInByte: number, byte: number): number {
  * @param bitIndex  - Index of bit to read
  * @author Kolja Blauhut
  */
-export function getBitAtIndex(array: Uint8Array, bitIndex: number): number {
+export function getBitAtIndex(array: Uint8Array, bitIndex: number): Bit {
   const byte = array[getByteIndexInArray(bitIndex)];
   const indexInByte = getBitIndex(bitIndex);
   const byteAND = setBitInByte(indexInByte, 0);
-  return (byte & byteAND) >> indexInByte;
+  return ((byte & byteAND) >> indexInByte) as Bit;
 }
