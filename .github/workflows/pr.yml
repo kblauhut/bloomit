@@ -1,9 +1,9 @@
-name: Test and Publish
+name: Test
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push request events but only for the main branch
-  push:
+  # Triggers the workflow pull request events but only for the main branch
+  pull_request:
     branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -34,10 +34,3 @@ jobs:
       - uses: borales/actions-yarn@v2.3.0
         with:
           cmd: test # will run `yarn test` command
-  publish:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    steps:
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
