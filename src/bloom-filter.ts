@@ -58,11 +58,12 @@ export default class BloomFilter {
    * @param size - The number of cells.
    * @param nbHashes - The number of hash functions used
    */
-  constructor(size: number, nbHashes: number) {
-    this._seed = 0x1234567890;
+  constructor(size: number, nbHashes: number, seed: number = 0x1234567890) {
+    const positiveIntSeed = Math.abs(Math.ceil(seed));
+    this._seed = positiveIntSeed;
     this._size = size;
     this._nbHashes = nbHashes;
-    this._filter = new Uint8Array(getUint8ArrayLength(this.size));
+    this._filter = new Uint8Array(getUint8ArrayLength(size));
     this._length = 0;
   }
 
@@ -72,10 +73,14 @@ export default class BloomFilter {
    * @param  errorRate  - The error rate desired for a maximum of items inserted
    * @return A new {@link BloomFilter}
    */
-  static create(nbItems: number, errorRate: number): BloomFilter {
+  static create(
+    nbItems: number,
+    errorRate: number,
+    seed: number = 0x1234567890
+  ): BloomFilter {
     const size = optimalFilterSize(nbItems, errorRate);
     const hashes = optimalHashes(size, nbItems);
-    return new BloomFilter(size, hashes);
+    return new BloomFilter(size, hashes, seed);
   }
 
   /**
@@ -87,9 +92,13 @@ export default class BloomFilter {
    * // create a filter with a false positive rate of 0.1
    * const filter = BloomFilter.from(['alice', 'bob', 'carl'], 0.1);
    */
-  static from(items: Iterable<HashableInput>, errorRate: number): BloomFilter {
+  static from(
+    items: Iterable<HashableInput>,
+    errorRate: number,
+    seed: number = 0x1234567890
+  ): BloomFilter {
     const array = Array.from(items);
-    const filter = BloomFilter.create(array.length, errorRate);
+    const filter = BloomFilter.create(array.length, errorRate, seed);
     array.forEach(element => filter.add(element));
     return filter;
   }
@@ -109,10 +118,10 @@ export default class BloomFilter {
 
     const bloomFilter = new BloomFilter(
       uint8ArrayToInt64(sizeArray),
-      uint8ArrayToInt64(nbHashesArray)
+      uint8ArrayToInt64(nbHashesArray),
+      uint8ArrayToInt64(seedArray)
     );
 
-    bloomFilter._seed = uint8ArrayToInt64(seedArray);
     bloomFilter._length = uint8ArrayToInt64(lengthArray);
     bloomFilter._filter = filterArray;
     return bloomFilter;
@@ -132,6 +141,22 @@ export default class BloomFilter {
    */
   get length(): number {
     return this._length;
+  }
+
+  /**
+   * Get the seed of the filter
+   * @return The filter seed
+   */
+  get seed(): number {
+    return this._seed;
+  }
+
+  /**
+   * Get the hash count of the filter
+   * @return The filter hash count
+   */
+  get nbHashes(): number {
+    return this._nbHashes;
   }
 
   /**
@@ -220,15 +245,14 @@ export default class BloomFilter {
    */
   export(): Uint8Array {
     const exportArray = new Uint8Array(this._filter.length + 4 * 8); // Filter length + 4 number parameters
-    exportArray.set(int64ToUint8Array(this._seed), 0);
-    exportArray.set(int64ToUint8Array(this._nbHashes), 8);
-    exportArray.set(int64ToUint8Array(this._length), 16);
-    exportArray.set(int64ToUint8Array(this._size), 24);
+    exportArray.set(int64ToUint8Array(this.seed), 0);
+    exportArray.set(int64ToUint8Array(this.nbHashes), 8);
+    exportArray.set(int64ToUint8Array(this.length), 16);
+    exportArray.set(int64ToUint8Array(this.size), 24);
 
-    let exportArrayIndex = 32;
+    const exportArrayStartIndex = 32;
     for (let index = 0; index < this._filter.length; index += 1) {
-      exportArray[exportArrayIndex] = this._filter[index];
-      exportArrayIndex += 1;
+      exportArray[index + exportArrayStartIndex] = this._filter[index];
     }
     return exportArray;
   }
