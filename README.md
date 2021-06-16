@@ -10,16 +10,6 @@ result in a theoretical memory reduction by a factor of 64.
 I have also edited the export to use a Uint8Array which encodes all needed
 values and can be used to send it over the web efficiently.
 
-### Classic Bloom Filter
-
-A Bloom filter is a space-efficient probabilistic data structure, conceived by
-Burton Howard Bloom in 1970, that is used to test whether an element is a member
-of a set. False positive matches are possible, but false negatives are not.
-
-**Reference:** Bloom, B. H. (1970). _Space/time trade-offs in hash coding with
-allowable errors_. Communications of the ACM, 13(7), 422-426.
-([Full text article](http://crystal.uta.edu/~mcguigan/cse6350/papers/Bloom.pdf))
-
 #### Methods
 
 - `add(element: string) -> void`: add an element into the filter.
@@ -28,27 +18,37 @@ allowable errors_. Communications of the ACM, 13(7), 422-426.
   might be in the filter.
 - `equals(other: BloomFilter) -> boolean`: Test if two filters are equals.
 - `rate() -> number`: compute the filter's false positive rate (or error rate).
+- `export() -> Uint8Array`: export the filter as an Uint8Array
+- `inport(filterUint8Array: Uint8Array) -> BloomFilter`: Create a filter from a
+  exporterd Uint8Array
 
 ```javascript
 const { BloomFilter } = require('bloomit');
 // create a Bloom Filter with a size of 10 and 4 hash functions
 let filter = new BloomFilter(10, 4);
 // insert data
-filter.add('alice');
-filter.add('bob');
+filter.add('paul');
+filter.add('kolja');
+filter.add('carl');
 
 // lookup for some data
-console.log(filter.has('bob')); // output: true
-console.log(filter.has('daniel')); // output: false
+console.log(filter.has('paul')); // output: true
+console.log(filter.has('xiaomei')); // output: false
 
 // print the error rate
 console.log(filter.rate());
 
 // alternatively, create a bloom filter optimal for a number of items and a desired error rate
-const items = ['alice', 'bob'];
+const items = ['paul', 'kolja', 'carl'];
 const errorRate = 0.04; // 4 % error rate
 filter = BloomFilter.create(items.length, errorRate);
 
 // or create a bloom filter optimal for a collections of items and a desired error rate
 filter = BloomFilter.from(items, errorRate);
+
+// Export the filter
+const exportedFilter = filter.export();
+
+// Import the filter
+filter = BloomFilter.import(exportedFilter);
 ```

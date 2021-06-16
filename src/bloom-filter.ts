@@ -152,6 +152,14 @@ export default class BloomFilter {
   }
 
   /**
+   * Get the hash count of the filter
+   * @return The filter hash count
+   */
+  get nbHashes(): number {
+    return this._nbHashes;
+  }
+
+  /**
    * Add an element to the filter
    * @param element - The element to add
    * @example
@@ -238,7 +246,7 @@ export default class BloomFilter {
   export(): Uint8Array {
     const exportArray = new Uint8Array(this._filter.length + 4 * 8); // Filter length + 4 number parameters
     exportArray.set(int64ToUint8Array(this.seed), 0);
-    exportArray.set(int64ToUint8Array(this._nbHashes), 8);
+    exportArray.set(int64ToUint8Array(this.nbHashes), 8);
     exportArray.set(int64ToUint8Array(this.length), 16);
     exportArray.set(int64ToUint8Array(this.size), 24);
 
