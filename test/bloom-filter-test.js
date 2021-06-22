@@ -116,6 +116,17 @@ describe('BloomFilter', () => {
     });
   });
 
+  describe('Dangerous input test', () => {
+    it('should not crash', () => {
+      //This input used to crash the bloom filter due to an endless recursion
+      const filter = new BloomFilter(39, 28, 78187493520);
+      filter.add(
+        'da5e21f8a67c4163f1a53ef43515bd027967da305ecfc741b2c3f40f832b7f82'
+      );
+      filter.length.should.equal(1);
+    });
+  });
+
   describe('Performance test', () => {
     const max = 1000;
     const targetedRate = 0.01;
