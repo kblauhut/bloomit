@@ -58,14 +58,11 @@ export type Bit = 0 | 1;
  */
 export function hashTwice(
   value: HashableInput,
-  asInt?: boolean,
-  seed?: number
+  seed: number,
+  asInt?: boolean
 ): TwoHashes {
   if (asInt === undefined) {
     asInt = false;
-  }
-  if (seed === undefined) {
-    seed = getDefaultSeed();
   }
   const f = XXH.h64(value, seed + 1);
   const l = XXH.h64(value, seed + 2);
@@ -109,7 +106,7 @@ export function doubleHashing(
   hashB: number,
   size: number
 ): number {
-  return Math.abs((hashA + n * hashB) % size);
+  return Math.abs((hashA + n + hashB) % size);
 }
 
 /**
@@ -127,9 +124,6 @@ export function getDistinctIndices(
   number: number,
   seed?: number
 ): Array<number> {
-  if (seed === undefined) {
-    seed = getDefaultSeed();
-  }
   function getDistinctIndicesBis(
     n: number,
     elem: HashableInput,
@@ -140,7 +134,7 @@ export function getDistinctIndices(
     if (indexes.length === count) {
       return indexes;
     } else {
-      const hashes = hashTwice(elem, true, seed! + (size % n));
+      const hashes = hashTwice(elem, seed! + (size % n), true);
       const ind = doubleHashing(n, hashes.first, hashes.second, size);
       if (indexes.includes(ind)) {
         // console.log('generate index: %d for %s', ind, elem)
@@ -153,15 +147,6 @@ export function getDistinctIndices(
     }
   }
   return getDistinctIndicesBis(1, element, size, number);
-}
-
-/**
- * Return the default seed used in the package
- * @return A ssed as a floating point number
- * @author Arnaud Grall
- */
-export function getDefaultSeed(): number {
-  return 0x1234567890;
 }
 
 /**

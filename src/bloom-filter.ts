@@ -57,6 +57,7 @@ export default class BloomFilter {
    * Constructor
    * @param size - The number of cells.
    * @param nbHashes - The number of hash functions used
+   * @param seed - The filter seed.
    */
   constructor(size: number, nbHashes: number, seed: number = 0x1234567890) {
     const positiveIntSeed = Math.abs(Math.ceil(seed));
