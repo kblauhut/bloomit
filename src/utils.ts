@@ -106,7 +106,9 @@ export function doubleHashing(
   hashB: number,
   size: number
 ): number {
-  return Math.abs((hashA + n*hashB) % size);
+  // Cubic term avoids increased-probability-of-collision issue, see
+  // http://peterd.org/pcd-diss.pdf s.6.5.4
+  return Math.abs((hashA + n*hashB + Math.floor((n**3 - n)/6)) % size);
 }
 
 /**
