@@ -126,6 +126,7 @@ export function getDistinctIndices(
   number: number,
   seed?: number
 ): Array<number> {
+  const hashes = hashTwice(element, seed!, true);
   function getDistinctIndicesBis(
     n: number,
     elem: HashableInput,
@@ -136,7 +137,6 @@ export function getDistinctIndices(
     if (indexes.length === count) {
       return indexes;
     } else {
-      const hashes = hashTwice(elem, seed! + (size % n), true);
       const ind = doubleHashing(n, hashes.first, hashes.second, size);
       if (indexes.includes(ind)) {
         // console.log('generate index: %d for %s', ind, elem)
