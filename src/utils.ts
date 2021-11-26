@@ -106,7 +106,7 @@ export function doubleHashing(
   hashB: number,
   size: number
 ): number {
-  return Math.abs((hashA + n + hashB) % size);
+  return Math.abs((hashA + n*hashB) % size);
 }
 
 /**
