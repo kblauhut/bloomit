@@ -48,9 +48,8 @@ export type HashableInput = string | ArrayBuffer | Buffer;
 export type Bit = 0 | 1;
 
 /**
- * (64-bits only) Hash a value into two values (in hex or integer format)
+ * Hash a value into two 32-bit values (in hex or integer format)
  * @param  value - The value to hash
- * @param  asInt - (optional) If True, the values will be returned as an integer. Otherwise, as hexadecimal values.
  * @param seed the seed used for hashing
  * @return The results of the hash functions applied to the value (in hex or integer)
  * @memberof Utils
@@ -59,32 +58,13 @@ export type Bit = 0 | 1;
 export function hashTwice(
   value: HashableInput,
   seed: number,
-  asInt?: boolean
 ): TwoHashes {
-  if (asInt === undefined) {
-    asInt = false;
-  }
-  const f = XXH.h64(value, seed + 1);
-  const l = XXH.h64(value, seed + 2);
-  if (asInt) {
-    return {
-      first: f.toNumber(),
-      second: l.toNumber(),
-    };
-  } else {
-    let one = f.toString(16);
-    if (one.length < 16) {
-      one = '0'.repeat(16 - one.length) + one;
-    }
-    let two = l.toString(16);
-    if (two.length < 16) {
-      two = '0'.repeat(16 - two.length) + two;
-    }
-    return {
-      first: Number(one),
-      second: Number(two),
-    };
-  }
+  const f = XXH.h32(value, seed + 1);
+  const l = XXH.h32(value, seed + 2);
+  return {
+    first: f.toNumber(),
+    second: l.toNumber(),
+  };
 }
 
 /**
@@ -126,7 +106,7 @@ export function getDistinctIndices(
   number: number,
   seed?: number
 ): Array<number> {
-  const {first, second} = hashTwice(element, seed!, true);
+  const {first, second} = hashTwice(element, seed || 0);
 	const indices: Array<number> = [];
 	let n = 0;
 	while(indices.length < number) {
