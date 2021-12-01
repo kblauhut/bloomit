@@ -48,9 +48,8 @@ export type HashableInput = string | ArrayBuffer | Buffer;
 export type Bit = 0 | 1;
 
 /**
- * (64-bits only) Hash a value into two values (in hex or integer format)
+ * Hash a value into two 32-bit values (in hex or integer format)
  * @param  value - The value to hash
- * @param  asInt - (optional) If True, the values will be returned as an integer. Otherwise, as hexadecimal values.
  * @param seed the seed used for hashing
  * @return The results of the hash functions applied to the value (in hex or integer)
  * @memberof Utils
@@ -59,32 +58,13 @@ export type Bit = 0 | 1;
 export function hashTwice(
   value: HashableInput,
   seed: number,
-  asInt?: boolean
 ): TwoHashes {
-  if (asInt === undefined) {
-    asInt = false;
-  }
-  const f = XXH.h64(value, seed + 1);
-  const l = XXH.h64(value, seed + 2);
-  if (asInt) {
-    return {
-      first: f.toNumber(),
-      second: l.toNumber(),
-    };
-  } else {
-    let one = f.toString(16);
-    if (one.length < 16) {
-      one = '0'.repeat(16 - one.length) + one;
-    }
-    let two = l.toString(16);
-    if (two.length < 16) {
-      two = '0'.repeat(16 - two.length) + two;
-    }
-    return {
-      first: Number(one),
-      second: Number(two),
-    };
-  }
+  const f = XXH.h32(value, seed + 1);
+  const l = XXH.h32(value, seed + 2);
+  return {
+    first: f.toNumber(),
+    second: l.toNumber(),
+  };
 }
 
 /**
@@ -106,7 +86,9 @@ export function doubleHashing(
   hashB: number,
   size: number
 ): number {
-  return Math.abs((hashA + n + hashB) % size);
+  // Cubic term avoids increased-probability-of-collision issue, see
+  // http://peterd.org/pcd-diss.pdf s.6.5.4
+  return Math.abs((hashA + n*hashB + Math.floor((n**3 - n)/6)) % size);
 }
 
 /**
@@ -124,29 +106,17 @@ export function getDistinctIndices(
   number: number,
   seed?: number
 ): Array<number> {
-  function getDistinctIndicesBis(
-    n: number,
-    elem: HashableInput,
-    size: number,
-    count: number,
-    indexes: Array<number> = []
-  ): Array<number> {
-    if (indexes.length === count) {
-      return indexes;
-    } else {
-      const hashes = hashTwice(elem, seed! + (size % n), true);
-      const ind = doubleHashing(n, hashes.first, hashes.second, size);
-      if (indexes.includes(ind)) {
-        // console.log('generate index: %d for %s', ind, elem)
-        return getDistinctIndicesBis(n + 1, elem, size, count, indexes);
-      } else {
-        // console.log('already found: %d for %s', ind, elem)
-        indexes.push(ind);
-        return getDistinctIndicesBis(n + 1, elem, size, count, indexes);
-      }
-    }
-  }
-  return getDistinctIndicesBis(1, element, size, number);
+  const {first, second} = hashTwice(element, seed || 0);
+	const indices: Array<number> = [];
+	let n = 0;
+	while(indices.length < number) {
+		const index = doubleHashing(n, first, second, size);
+		if(!indices.includes(index)) {
+			indices.push(index);
+		}
+		n++;
+	}
+	return indices;
 }
 
 /**
