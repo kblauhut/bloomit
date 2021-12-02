@@ -97,6 +97,9 @@ export function doubleHashing(
  * @param  size     - the range on which we can generate an index [0, size) = size
  * @param  number   - The number of indexes desired
  * @param  seed     - The seed used
+ * @param  maxIterations - throw if we exceed this without finding a result of the
+ * requested size; avoids a hard busy loop in the event of an algorithm failure. Defaults
+ * to size*100
  * @return A array of indexes
  * @author Arnaud Grall
  */
@@ -104,19 +107,37 @@ export function getDistinctIndices(
   element: HashableInput,
   size: number,
   number: number,
-  seed?: number
+  seed: number = 0,
+  maxIterations: number = size * 100
 ): Array<number> {
-  const {first, second} = hashTwice(element, seed || 0);
-	const indices: Array<number> = [];
-	let n = 0;
-	while(indices.length < number) {
-		const index = doubleHashing(n, first, second, size);
-		if(!indices.includes(index)) {
-			indices.push(index);
-		}
-		n++;
-	}
-	return indices;
+  let {first, second} = hashTwice(element, seed);
+  let index, i = 1;
+  const indices: Array<number> = [];
+  // Implements enhanced double hashing algorithm from
+  // http://peterd.org/pcd-diss.pdf s.6.5.4
+  while(indices.length < number) {
+    index = first % size;
+    if(!indices.includes(index)) {
+      indices.push(index);
+    }
+    first = (first + second) % size;
+    second = (second + i) % size;
+    i++;
+
+    if(i > size) {
+      // Enhanced double hashing stops cycles of length less than `size` in the case where
+      // size is coprime with the second hash. But you still get cycles of length `size`.
+      // So if we reach there and haven't finished, append a prime to the input and
+      // rehash.
+      seed++;
+      ({first, second} = hashTwice(element, seed));
+    }
+
+    if(maxIterations && i > maxIterations) {
+      throw new Error('max iterations exceeded');
+    }
+  }
+  return indices;
 }
 
 /**
