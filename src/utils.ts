@@ -68,30 +68,6 @@ export function hashTwice(
 }
 
 /**
- * Apply Double Hashing to produce a n-hash
- *
- * This implementation used directly the value produced by the two hash functions instead of the functions themselves.
- * @see {@link http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=4060353E67A356EF9528D2C57C064F5A?doi=10.1.1.152.579&rep=rep1&type=pdf} for more details about double hashing.
- * @param  n - The indice of the hash function we want to produce
- * @param  hashA - The result of the first hash function applied to a value.
- * @param  hashB - The result of the second hash function applied to a value.
- * @param  size - The size of the datastructures associated to the hash context (ex: the size of a Bloom Filter)
- * @return The result of hash_n applied to a value.
- * @memberof Utils
- * @author Thomas Minier
- */
-export function doubleHashing(
-  n: number,
-  hashA: number,
-  hashB: number,
-  size: number
-): number {
-  // Cubic term avoids increased-probability-of-collision issue, see
-  // http://peterd.org/pcd-diss.pdf s.6.5.4
-  return Math.abs((hashA + n*hashB + Math.floor((n**3 - n)/6)) % size);
-}
-
-/**
  * Generate a set of distinct indexes on interval [0, size) using the double hashing technique
  * @param  element  - The element to hash
  * @param  size     - the range on which we can generate an index [0, size) = size
